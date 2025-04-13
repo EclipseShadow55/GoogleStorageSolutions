@@ -13,7 +13,6 @@ creds = service_account.Credentials.from_service_account_file(
     config["service_account_creds_filepath"], scopes=SCOPE)
 gc = gspread.authorize(creds)
 
-
 class GoogleSheetsStorage:
     def __init__(self, client, project_name: str, folder_id: str | None = None):
         self.client = client
@@ -28,7 +27,7 @@ class GoogleSheetsStorage:
         ind = self.sheets.index(sheet)
         worksheet = self.file.get_worksheet(ind)
         real_values = []
-        if isisntance(values, dict):
+        if isinstance(values, dict):
             temp = deepcopy(values)
             for key, item in temp:
                 real_values.append([key] + item)
@@ -39,11 +38,11 @@ class GoogleSheetsStorage:
         maxwidth = 0
         maxheight = len(real_values)
         for item in real_values:
-            if len(item) > maxwitdth:
+            if len(item) > maxwidth:
                 maxwidth = len(item)
         for item in real_values:
-            if len(item) < max_width:
-                item += ["" for _ in range(max_width - len(item))]
+            if len(item) < maxwidth:
+                item += ["" for _ in range(maxwidth - len(item))]
         worksheet.update(real_values, "USER_ENTERED")
 
     async def load(self, sheet: str, ran: str):
@@ -54,7 +53,7 @@ class GoogleSheetsStorage:
     async def create_sheet(self, name: str, vals: dict[str, list[str | int]] | list[list[str | int]] | None = None):
         self.file.add_worksheet(name, 100, 26)
         if vals is not None:
-            self.dump(name, vals)
+            await self.dump(name, vals)
 
     async def del_sheet(self, name):
         ind = self.sheets.index(name)
